@@ -29,6 +29,20 @@ document.addEventListener('DOMContentLoaded', async function() {
     return backgroundPlane;
   };
 
+  const createFloorPlane = (scene, texturePath) => {
+  const floorPlane = BABYLON.MeshBuilder.CreatePlane("floorPlane", { width: planeWidth, height: planeWidth }, scene);
+  floorPlane.position.y = -0.5;
+  floorPlane.rotation.x = Math.PI / 2;
+
+  const floorPlaneMaterial = new BABYLON.StandardMaterial("floorPlaneMaterial", scene);
+  floorPlaneMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
+  floorPlaneMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
+  floorPlaneMaterial.backFaceCulling = false;
+  floorPlane.material = floorPlaneMaterial;
+
+  return floorPlane;
+};
+
   //Game over
   const gameOverDisplay = document.createElement('div');
   gameOverDisplay.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: white; display: none; cursor: pointer;';
@@ -80,8 +94,11 @@ const loadGLTFModel = async (scene, url) => {
   const createScene = async () => {
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-    createBackgroundPlane(scene, "canvasbg.png");
+    createBackgroundPlane(scene, "spacefloor.jpg");
     const backgroundPlane = createBackgroundPlane(scene, "canvasbg.png");
+
+    // const floorPlane = createFloorPlane(scene, "spacefloor.jpg");
+
 
     // Camera
     const camera = new BABYLON.FreeCamera('freeCamera', new BABYLON.Vector3(0, 4, -10), scene);
