@@ -65,11 +65,15 @@ document.addEventListener('DOMContentLoaded', async function() {
   //   restartGame();
   // });
 
-  const loadGLTFModel = async (scene, url) => {
-    const result = await BABYLON.SceneLoader.ImportMeshAsync(null, "", url, scene);
-    const model = result.meshes[0];
-    return model;
-  };
+const loadGLTFModel = async (scene, url) => {
+  const result = await BABYLON.SceneLoader.ImportMeshAsync(null, "", url, scene);
+  const model = result.meshes[0];
+
+  // Update the bounding info
+  model.refreshBoundingInfo();
+
+  return model;
+};
 
 
 
@@ -110,7 +114,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Spaceship
     const spaceship = await loadGLTFModel(scene, './spaceshipa.glb'); // Change this path to the correct one
-    spaceship.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+    spaceship.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
+
+    
     spaceship.position.y = 1;
 
     // Set camera target
@@ -290,6 +296,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     scene.getPhysicsEngine().setTimeStep(1 / 120);
 
     spaceship.physicsImpostor = new BABYLON.PhysicsImpostor(spaceship, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 0 }, scene);
+
+      spaceship.physicsImpostor.dispose();
+  spaceship.physicsImpostor = new BABYLON.PhysicsImpostor(spaceship, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 0 }, scene);
 
     for (const trackSegment of trackSegments) {
       trackSegment.physicsImpostor = new BABYLON.PhysicsImpostor(trackSegment, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
