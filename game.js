@@ -6,9 +6,17 @@ document.addEventListener('DOMContentLoaded', async function() {
   let spaceshipSpeed = 0.1;
   const speedChangeFactor = 0.01;
 
+  //backgroundPlane variables
+  const imageWidth = 1536; // Replace with your image's width
+  const imageHeight = 768; // Replace with your image's height
+
+  const aspectRatio = imageWidth / imageHeight;
+  const planeHeight = 100; // You can adjust this value to change the height of the background plane
+  const planeWidth = planeHeight * aspectRatio;
+
   //skybox for background
   const createBackgroundPlane = (scene, texturePath) => {
-    const backgroundPlane = BABYLON.MeshBuilder.CreatePlane("backgroundPlane", { width: 1000, height: 1000 }, scene);
+    const backgroundPlane = BABYLON.MeshBuilder.CreatePlane("backgroundPlane", { width: planeWidth, height: planeHeight }, scene);
     backgroundPlane.position.z = -100;
     backgroundPlane.rotation.y = Math.PI;
 
@@ -131,16 +139,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     const createObstacles = (startZ) => {
       const newObstacles = [];
       for (let i = 0; i < 20; i++) {
-        const obstacle = BABYLON.MeshBuilder.CreateBox('obstacle' + i, { width: trackWidth - gapSize, height: obstacleHeight, depth: 1 }, scene);
+        const obstacleWidth = Math.random() * (trackWidth - gapSize) + gapSize;
+        const obstacle = BABYLON.MeshBuilder.CreateBox('obstacle' + i, { width: obstacleWidth, height: obstacleHeight, depth: 1 }, scene);
         obstacle.position.y = 0.5;
         obstacle.position.z = startZ - 10 * i - 20;
-        obstacle.position.x = (Math.random() - 0.5) * gapSize;
+
+        const halfGap = Math.random() * (trackWidth - obstacleWidth) / 2;
+        const direction = Math.random() > 0.5 ? 1 : -1;
+        obstacle.position.x = direction * halfGap;
+
         obstacle.material = new BABYLON.StandardMaterial('obstacleMat' + i, scene);
         obstacle.material.diffuseColor = new BABYLON.Color3(1, 0, 0);
         newObstacles.push(obstacle);
       }
       return newObstacles;
     };
+
 
     trackSegments.push(createTrackSegment(0));
     trackSegments.push(createTrackSegment(-trackDepth));
