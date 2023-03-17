@@ -7,21 +7,18 @@ document.addEventListener('DOMContentLoaded', async function() {
   const speedChangeFactor = 0.01;
 
   //skybox for background
-  const createSkybox = (scene, texturePath) => {
-    const skybox = BABYLON.MeshBuilder.CreateBox("skybox", { size: 1000 }, scene);
-    const skyboxMaterial = new BABYLON.StandardMaterial("skyboxMaterial", scene);
+  const createBackgroundPlane = (scene, texturePath) => {
+    const backgroundPlane = BABYLON.MeshBuilder.CreatePlane("backgroundPlane", { width: 1000, height: 1000 }, scene);
+    backgroundPlane.position.z = -100;
+    backgroundPlane.rotation.y = Math.PI;
 
-    skyboxMaterial.backFaceCulling = false;
-    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(texturePath, scene);
-    skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-    skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-    skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-    skyboxMaterial.disableLighting = true;
+    const backgroundPlaneMaterial = new BABYLON.StandardMaterial("backgroundPlaneMaterial", scene);
+    backgroundPlaneMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
+    backgroundPlaneMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
+    backgroundPlaneMaterial.backFaceCulling = false;
+    backgroundPlane.material = backgroundPlaneMaterial;
 
-    skybox.material = skyboxMaterial;
-    skybox.infiniteDistance = true;
-
-    return skybox;
+    return backgroundPlane;
   };
 
   //Game over
@@ -71,7 +68,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   const createScene = async () => {
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-    createSkybox(scene, "./cubemap.png"); // Replace with your image's path and extension
+    createBackgroundPlane(scene, "canvasbg.png");
+    const backgroundPlane = createBackgroundPlane(scene, "canvasbg.png");
 
     // Camera
     const camera = new BABYLON.FreeCamera('freeCamera', new BABYLON.Vector3(0, 4, -10), scene);
@@ -82,13 +80,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     camera.cameraAcceleration = 0.05;
     camera.maxCameraSpeed = 10;
 
-    const updateCamera = () => {
+    const updateCamera = (backgroundPlane) => {
+
       const targetPosition = spaceship.position.clone();
       targetPosition.y = 4;
       targetPosition.z += 10;
 
       camera.position.x += (targetPosition.x - camera.position.x) * 0.1;
       camera.position.z += (targetPosition.z - camera.position.z) * 0.1;
+
+      // Add the following lines at the end of the updateCamera function
+      backgroundPlane.position.x = camera.position.x;
+      backgroundPlane.position.y = camera.position.y;
+      backgroundPlane.position.z = camera.position.z - 100;
+
+
     };
 
     // Lights
@@ -179,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       // Keep the spaceship upright
       spaceship.rotationQuaternion = BABYLON.Quaternion.Identity();
 
-      updateCamera();
+      updateCamera(backgroundPlane);
 
       if (inputMap[" "] && spaceship.position.y <= 1) {
         spaceship.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 1, 0), spaceship.getAbsolutePosition());
