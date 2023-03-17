@@ -127,7 +127,11 @@ document.addEventListener('DOMContentLoaded', async function() {
       trackSegment.position.y = -0.25;
       trackSegment.position.z = startZ - trackDepth / 2;
       trackSegment.material = new BABYLON.StandardMaterial('trackMat', scene);
-      trackSegment.material.diffuseTexture = new BABYLON.Texture('./texture.png', scene); // Replace with your image's path and extension
+      const trackTexture = new BABYLON.Texture('./road0.jpg', scene); // Replace with your image's path and extension
+      trackTexture.uScale = 50; // Repeat the texture 5 times along the width
+      trackTexture.vScale = 10; // Repeat the texture 20 times along the depth
+
+      trackSegment.material.diffuseTexture = trackTexture;
 
       // trackSegment.material.diffuseColor = new BABYLON.Color3(0, 0, 1);
       return trackSegment;
