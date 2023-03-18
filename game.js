@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
       updateCamera();
 
-      if (inputMap[" "] && spaceship.position.y <= 1) {
+      if (inputMap[" "] && spaceship.position.y <= 1 && !inputMap["ArrowLeft"] && !inputMap["ArrowRight"]) {
         spaceship.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 1, 0), spaceship.getAbsolutePosition());
       }
 
@@ -277,6 +277,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         showGameOver();
 
       }
+
+      // console.log(inputMap)
 
       // Update score based on distance covered
       score = Math.floor(-spaceship.position.z);
