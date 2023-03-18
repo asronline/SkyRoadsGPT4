@@ -1,5 +1,21 @@
+const playBackgroundMusic = (musicFilePath) => {
+  const music = new Audio(musicFilePath);
+  music.loop = true;
+  music.autoplay = true; // Add this line
+  music.muted = true; // Add this line
+  music.play()
+    .then(() => {
+      music.muted = false; // Unmute the audio once it starts playing
+    })
+    .catch((error) => {
+      console.error('Error playing background music:', error);
+    });
+  return music;
+};
+
+
 document.addEventListener('DOMContentLoaded', async function() {
-  // const backgroundMusic = playBackgroundMusic('bgmusic.mp3');
+  const backgroundMusic = playBackgroundMusic('bgmusic.mp3');
   const canvas = document.getElementById('renderCanvas');
   const engine = new BABYLON.Engine(canvas, true);
   const scoreDisplay = document.getElementById('scoreDisplay');
@@ -7,6 +23,14 @@ document.addEventListener('DOMContentLoaded', async function() {
   let spaceshipSpeed = 0.1;
   const speedChangeFactor = 0.01;
   let trackDirection = 0;
+
+  let musicStarted = false;
+  document.addEventListener('keydown', () => {
+    if (!musicStarted) {
+      playBackgroundMusic('bgmusic.mp3');
+      musicStarted = true;
+    }
+  });
 
   // //backgroundPlane variables
   // const imageWidth = 1536; // Replace with your image's width
@@ -47,12 +71,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   //bg music
 
-  // const playBackgroundMusic = (musicFilePath) => {
-  //   const music = new Audio(musicFilePath);
-  //   music.loop = true;
-  //   music.play();
-  //   return music;
-  // };
 
 
 
@@ -107,8 +125,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       scene.render();
     });
 
-    // backgroundMusic.currentTime = 0;
-    // backgroundMusic.play();
+    backgroundMusic.currentTime = 0;
+    backgroundMusic.play();
   };
 
   // gameOverDisplay.addEventListener('click', () => {
