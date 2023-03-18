@@ -1,10 +1,12 @@
 document.addEventListener('DOMContentLoaded', async function() {
+  // const backgroundMusic = playBackgroundMusic('bgmusic.mp3');
   const canvas = document.getElementById('renderCanvas');
   const engine = new BABYLON.Engine(canvas, true);
   const scoreDisplay = document.getElementById('scoreDisplay');
   let score = 0;
   let spaceshipSpeed = 0.1;
   const speedChangeFactor = 0.01;
+  let trackDirection = 0;
 
   // //backgroundPlane variables
   // const imageWidth = 1536; // Replace with your image's width
@@ -42,6 +44,17 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   //   return floorPlane;
   // 
+
+  //bg music
+
+  // const playBackgroundMusic = (musicFilePath) => {
+  //   const music = new Audio(musicFilePath);
+  //   music.loop = true;
+  //   music.play();
+  //   return music;
+  // };
+
+
 
   const createSkybox = (scene, texturePath) => {
     const skybox = BABYLON.Mesh.CreateSphere('skybox', 32, 1000, scene);
@@ -93,6 +106,9 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
       scene.render();
     });
+
+    // backgroundMusic.currentTime = 0;
+    // backgroundMusic.play();
   };
 
   // gameOverDisplay.addEventListener('click', () => {
@@ -115,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color3(0.1, 0.1, 0.1);
 
-    createSkybox(scene, "./skybox.jpg"); // Update the path to your skybox image if necessary
+    createSkybox(scene, "./skybox2.jpg"); // Update the path to your skybox image if necessary
 
 
     // createBackgroundPlane(scene, "spacefloor.jpg");
@@ -162,10 +178,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     let trackSegments = [];
     let obstacles = [];
 
-    const createTrackSegment = (startZ) => {
+    const createTrackSegment = (startZ, direction) => {
       const trackSegment = BABYLON.MeshBuilder.CreateBox('trackSegment', { width: trackWidth, height: 0.5, depth: trackDepth }, scene);
       trackSegment.position.y = -0.25;
       trackSegment.position.z = startZ - trackDepth / 2;
+      trackSegment.position.x = direction * trackWidth;
+      trackSegment.rotation.y = direction * Math.PI / 6;
       trackSegment.material = new BABYLON.StandardMaterial('trackMat', scene);
       const trackTexture = new BABYLON.Texture('./texture2.jpg', scene); // Replace with your image's path and extension
       trackTexture.uScale = 15; // Repeat the texture 5 times along the width
@@ -200,10 +218,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     };
 
 
-    trackSegments.push(createTrackSegment(0));
-    trackSegments.push(createTrackSegment(-trackDepth));
-    // Add the third track segment and set of obstacles
-    trackSegments.push(createTrackSegment(-2 * trackDepth));
+    trackSegments.push(createTrackSegment(0, 0));
+    trackSegments.push(createTrackSegment(-trackDepth, 0));
+    trackSegments.push(createTrackSegment(-2 * trackDepth, 0));
+
     obstacles = obstacles.concat(createObstacles(0));
     obstacles = obstacles.concat(createObstacles(-trackDepth));
     // Add the new set of obstacles for the third track segment
@@ -271,25 +289,37 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Move the first track segment to the end
         const firstTrackSegment = trackSegments.shift();
         firstTrackSegment.position.z = trackSegments[trackSegments.length - 1].position.z - trackDepth;
+
+        // Randomly change the track direction with higher probability
+        const randomDirection = Math.random();
+        if (randomDirection < 0.45) {
+          trackDirection = -1;
+        } else if (randomDirection < 0.9) {
+          trackDirection = 1;
+        } else {
+          trackDirection = 0;
+        }
+        firstTrackSegment.position.x = trackDirection * trackWidth;
+        firstTrackSegment.rotation.y = trackDirection * Math.PI / 6;
         trackSegments.push(firstTrackSegment);
 
         // Move the first 20 obstacles to the end
         const firstObstacles = obstacles.splice(0, 20);
         for (let i = 0; i < firstObstacles.length; i++) {
           firstObstacles[i].position.z = obstacles[obstacles.length - 1].position.z - 10;
-          firstObstacles[i].position.x = (Math.random() - 0.5) * gapSize;
+          firstObstacles[i].position.x = (Math.random() - 0.5) * gapSize + trackDirection * trackWidth;
         }
         obstacles = obstacles.concat(firstObstacles);
       }
 
 
-
       // Check for collisions
       for (const obstacle of obstacles) {
-        if (spaceship.intersectsMesh(obstacle, false) && spaceship.position.y <= obstacleHeight) {
-          // Restart the game or end the game
-          showGameOver();
-        }
+        //COMMENT IT OUT IF YOU WANT TO DRIVE ENDLESSLY
+        // if (spaceship.intersectsMesh(obstacle, false) && spaceship.position.y <= obstacleHeight) {
+        //   // Restart the game or end the game
+        //   showGameOver();
+        // }
       }
     });
 
