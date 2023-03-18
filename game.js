@@ -6,42 +6,62 @@ document.addEventListener('DOMContentLoaded', async function() {
   let spaceshipSpeed = 0.1;
   const speedChangeFactor = 0.01;
 
-  //backgroundPlane variables
-  const imageWidth = 1536; // Replace with your image's width
-  const imageHeight = 768; // Replace with your image's height
+  // //backgroundPlane variables
+  // const imageWidth = 1536; // Replace with your image's width
+  // const imageHeight = 768; // Replace with your image's height
 
-  const aspectRatio = imageWidth / imageHeight;
-  const planeHeight = 100; // You can adjust this value to change the height of the background plane
-  const planeWidth = planeHeight * aspectRatio;
+  // const aspectRatio = imageWidth / imageHeight;
+  // const planeHeight = 100; // You can adjust this value to change the height of the background plane
+  // const planeWidth = planeHeight * aspectRatio;
 
-  //skybox for background
-  const createBackgroundPlane = (scene, texturePath) => {
-    const backgroundPlane = BABYLON.MeshBuilder.CreatePlane("backgroundPlane", { width: planeWidth, height: planeHeight }, scene);
-    backgroundPlane.position.z = -100;
-    backgroundPlane.rotation.y = Math.PI;
+  // //skybox for background
+  // const createBackgroundPlane = (scene, texturePath) => {
+  //   const backgroundPlane = BABYLON.MeshBuilder.CreatePlane("backgroundPlane", { width: planeWidth, height: planeHeight }, scene);
+  //   backgroundPlane.position.z = -100;
+  //   backgroundPlane.rotation.y = Math.PI;
 
-    const backgroundPlaneMaterial = new BABYLON.StandardMaterial("backgroundPlaneMaterial", scene);
-    backgroundPlaneMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
-    backgroundPlaneMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
-    backgroundPlaneMaterial.backFaceCulling = false;
-    backgroundPlane.material = backgroundPlaneMaterial;
+  //   const backgroundPlaneMaterial = new BABYLON.StandardMaterial("backgroundPlaneMaterial", scene);
+  //   backgroundPlaneMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
+  //   backgroundPlaneMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
+  //   backgroundPlaneMaterial.backFaceCulling = false;
+  //   backgroundPlane.material = backgroundPlaneMaterial;
 
-    return backgroundPlane;
+  //   return backgroundPlane;
+  // };
+
+  // const createFloorPlane = (scene, texturePath) => {
+  //   const floorPlane = BABYLON.MeshBuilder.CreatePlane("floorPlane", { width: planeWidth, height: planeWidth }, scene);
+  //   floorPlane.position.y = -0.5;
+  //   floorPlane.rotation.x = Math.PI / 2;
+
+  //   const floorPlaneMaterial = new BABYLON.StandardMaterial("floorPlaneMaterial", scene);
+  //   floorPlaneMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
+  //   floorPlaneMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
+  //   floorPlaneMaterial.backFaceCulling = false;
+  //   floorPlane.material = floorPlaneMaterial;
+
+  //   return floorPlane;
+  // 
+
+  const createSkybox = (scene, texturePath) => {
+    const skybox = BABYLON.Mesh.CreateSphere('skybox', 32, 1000, scene);
+    const skyboxMaterial = new BABYLON.StandardMaterial('skyboxMaterial', scene);
+
+    skyboxMaterial.backFaceCulling = false;
+    skyboxMaterial.disableLighting = true; // Disable lighting to avoid unwanted shading on the skybox
+    skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+    skyboxMaterial.emissiveTexture = new BABYLON.Texture(texturePath, scene); // Use Texture instead of CubeTexture
+    skyboxMaterial.emissiveTexture.coordinatesMode = BABYLON.Texture.SPHERICAL_MODE; // Set coordinates mode to SPHERICAL_MODE
+
+    skybox.material = skyboxMaterial;
+    skybox.isPickable = false; // Disable picking to avoid clicking on the skybox
+
+    return skybox;
   };
 
-  const createFloorPlane = (scene, texturePath) => {
-  const floorPlane = BABYLON.MeshBuilder.CreatePlane("floorPlane", { width: planeWidth, height: planeWidth }, scene);
-  floorPlane.position.y = -0.5;
-  floorPlane.rotation.x = Math.PI / 2;
 
-  const floorPlaneMaterial = new BABYLON.StandardMaterial("floorPlaneMaterial", scene);
-  floorPlaneMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
-  floorPlaneMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
-  floorPlaneMaterial.backFaceCulling = false;
-  floorPlane.material = floorPlaneMaterial;
 
-  return floorPlane;
-};
 
   //Game over
   const gameOverDisplay = document.createElement('div');
@@ -79,23 +99,27 @@ document.addEventListener('DOMContentLoaded', async function() {
   //   restartGame();
   // });
 
-const loadGLTFModel = async (scene, url) => {
-  const result = await BABYLON.SceneLoader.ImportMeshAsync(null, "", url, scene);
-  const model = result.meshes[0];
+  const loadGLTFModel = async (scene, url) => {
+    const result = await BABYLON.SceneLoader.ImportMeshAsync(null, "", url, scene);
+    const model = result.meshes[0];
 
-  // Update the bounding info
-  model.refreshBoundingInfo();
+    // Update the bounding info
+    model.refreshBoundingInfo();
 
-  return model;
-};
+    return model;
+  };
 
 
 
   const createScene = async () => {
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-    createBackgroundPlane(scene, "spacefloor.jpg");
-    const backgroundPlane = createBackgroundPlane(scene, "canvasbg.png");
+
+    createSkybox(scene, "./skybox.jpg"); // Update the path to your skybox image if necessary
+
+
+    // createBackgroundPlane(scene, "spacefloor.jpg");
+    // const backgroundPlane = createBackgroundPlane(scene, "canvasbg.png");
 
     // const floorPlane = createFloorPlane(scene, "spacefloor.jpg");
 
@@ -109,22 +133,15 @@ const loadGLTFModel = async (scene, url) => {
     camera.cameraAcceleration = 0.05;
     camera.maxCameraSpeed = 10;
 
-    const updateCamera = (backgroundPlane) => {
-
+    const updateCamera = () => {
       const targetPosition = spaceship.position.clone();
       targetPosition.y = 4;
       targetPosition.z += 10;
 
       camera.position.x += (targetPosition.x - camera.position.x) * 0.1;
       camera.position.z += (targetPosition.z - camera.position.z) * 0.1;
-
-      // Add the following lines at the end of the updateCamera function
-      backgroundPlane.position.x = camera.position.x;
-      backgroundPlane.position.y = camera.position.y;
-      backgroundPlane.position.z = camera.position.z - 100;
-
-
     };
+
 
     // Lights
     const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
@@ -133,7 +150,7 @@ const loadGLTFModel = async (scene, url) => {
     const spaceship = await loadGLTFModel(scene, './spaceshipa.glb'); // Change this path to the correct one
     spaceship.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
 
-    
+
     spaceship.position.y = 1;
 
     // Set camera target
@@ -150,9 +167,9 @@ const loadGLTFModel = async (scene, url) => {
       trackSegment.position.y = -0.25;
       trackSegment.position.z = startZ - trackDepth / 2;
       trackSegment.material = new BABYLON.StandardMaterial('trackMat', scene);
-      const trackTexture = new BABYLON.Texture('./road0.jpg', scene); // Replace with your image's path and extension
-      trackTexture.uScale = 50; // Repeat the texture 5 times along the width
-      trackTexture.vScale = 10; // Repeat the texture 20 times along the depth
+      const trackTexture = new BABYLON.Texture('./texture2.jpg', scene); // Replace with your image's path and extension
+      trackTexture.uScale = 15; // Repeat the texture 5 times along the width
+      trackTexture.vScale = 1; // Repeat the texture 20 times along the depth
 
       trackSegment.material.diffuseTexture = trackTexture;
 
@@ -226,7 +243,7 @@ const loadGLTFModel = async (scene, url) => {
       // Keep the spaceship upright
       spaceship.rotationQuaternion = BABYLON.Quaternion.Identity();
 
-      updateCamera(backgroundPlane);
+      updateCamera();
 
       if (inputMap[" "] && spaceship.position.y <= 1) {
         spaceship.physicsImpostor.applyImpulse(new BABYLON.Vector3(0, 1, 0), spaceship.getAbsolutePosition());
@@ -314,8 +331,8 @@ const loadGLTFModel = async (scene, url) => {
 
     spaceship.physicsImpostor = new BABYLON.PhysicsImpostor(spaceship, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 0 }, scene);
 
-      spaceship.physicsImpostor.dispose();
-  spaceship.physicsImpostor = new BABYLON.PhysicsImpostor(spaceship, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 0 }, scene);
+    spaceship.physicsImpostor.dispose();
+    spaceship.physicsImpostor = new BABYLON.PhysicsImpostor(spaceship, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 0 }, scene);
 
     for (const trackSegment of trackSegments) {
       trackSegment.physicsImpostor = new BABYLON.PhysicsImpostor(trackSegment, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
