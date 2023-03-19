@@ -1,4 +1,46 @@
-html {
-  height: 100%;
-  width: 100%;
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #222;
+  font-family: 'VT323', monospace;
+  color: #fff;
+}
+
+#game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* #bestScoreDisplay {
+
+} */
+
+#canvas-container {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  background-image: url('./TVCanvas.png');
+  background-size: cover;
+  background-position: center;
+}
+
+h2 {
+  margin-bottom: -5px;
+}
+
+canvas {
+  position: absolute;
+  top: 8%;
+  left: 7%;
+  border: 1px solid rgba(255,255,255,0);
+  border-radius: 20px;
+  background-color: transparent;
+}
+
+#renderCanvas:focus {
+  outline: none;
 }

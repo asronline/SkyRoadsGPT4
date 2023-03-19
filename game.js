@@ -16,11 +16,22 @@ const playBackgroundMusic = (musicFilePath) => {
 
 
 document.addEventListener('DOMContentLoaded', async function() {
-  const backgroundMusic = playBackgroundMusic('bgmusic.mp3');
   const canvas = document.getElementById('renderCanvas');
+
+  window.addEventListener('load', () => {
+    canvas.focus();
+  });
+
+  const backgroundMusic = playBackgroundMusic('bgmusic.mp3');
   const engine = new BABYLON.Engine(canvas, true);
   const scoreDisplay = document.getElementById('scoreDisplay');
   let score = 0;
+
+  let bestScore = 0;
+const bestScoreDisplay = document.getElementById('bestScoreDisplay');
+
+
+
   let spaceshipSpeed = 0.1;
   const speedChangeFactor = 0.01;
   let trackDirection = 0;
@@ -106,6 +117,10 @@ document.addEventListener('DOMContentLoaded', async function() {
   const showGameOver = () => {
     isGameOver = true;
     gameOverDisplay.style.display = 'block';
+    if (score > bestScore) {
+      bestScore = score;
+      bestScoreDisplay.innerHTML = "Best Score: " + bestScore;
+    }
   };
 
   const restartGame = async () => {
@@ -218,22 +233,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     const gapSize = 3;
     const obstacleHeight = 1;
 
-const createObstacles = (startZ) => {
-const newObstacles = [];
-// Existing obstacle creation logic...
-for (let i = 0; i < 20; i++) {
-const obstacleWidth = Math.random() * (trackWidth - gapSize) + gapSize;
-const obstacle = BABYLON.MeshBuilder.CreateBox('obstacle' + i, { width: obstacleWidth, height: obstacleHeight, depth: 1 }, scene);
-obstacle.position.y = 0.5;
-obstacle.position.z = startZ - 10 * i - 20;
-const halfGap = Math.random() * (trackWidth - obstacleWidth) / 2; 
-const direction = Math.random() > 0.5 ? 1 : -1; 
-obstacle.position.x = direction * halfGap; 
+    const createObstacles = (startZ, trackPositionX) => {
+      const newObstacles = [];
+      // Existing obstacle creation logic...
+      for (let i = 0; i < 20; i++) {
+        const obstacleWidth = Math.random() * (trackWidth - gapSize) + gapSize;
+        const obstacle = BABYLON.MeshBuilder.CreateBox('obstacle' + i, { width: obstacleWidth, height: obstacleHeight, depth: 1 }, scene);
+        obstacle.position.y = 0.5;
+        obstacle.position.z = startZ - 10 * i - 20;
+        const halfGap = Math.random() * (trackWidth - obstacleWidth) / 2;
+        const direction = Math.random() > 0.5 ? 1 : -1;
+        obstacle.position.x = direction * halfGap + trackPositionX;
 
-obstacle.material = new BABYLON.StandardMaterial('obstacleMat' + i, scene); 
-obstacle.material.diffuseColor = new BABYLON.Color3(1, 0, 0); 
-newObstacles.push(obstacle); 
-}
+        obstacle.material = new BABYLON.StandardMaterial('obstacleMat' + i, scene);
+        obstacle.material.diffuseColor = new BABYLON.Color3(1, 0, 0);
+        newObstacles.push(obstacle);
+      }
       return newObstacles;
     };
 
@@ -242,10 +257,10 @@ newObstacles.push(obstacle);
     trackSegments.push(createTrackSegment(-trackDepth, 0));
     trackSegments.push(createTrackSegment(-2 * trackDepth, 0));
 
-    obstacles = obstacles.concat(createObstacles(0));
-    obstacles = obstacles.concat(createObstacles(-trackDepth));
+    obstacles = obstacles.concat(createObstacles(0, 0));
+    obstacles = obstacles.concat(createObstacles(-trackDepth, 0));
     // Add the new set of obstacles for the third track segment
-    obstacles = obstacles.concat(createObstacles(-2 * trackDepth));
+    obstacles = obstacles.concat(createObstacles(-2 * trackDepth, 0));
 
 
     // Game loop
@@ -307,7 +322,8 @@ newObstacles.push(obstacle);
       scoreDisplay.innerHTML = "Score: " + score;
       if (spaceship.position.z <= obstacles[obstacles.length - 1].position.z - 100) {
         // Generate new obstacles 100 units in front of the last obstacle
-        obstacles = obstacles.concat(createObstacles(obstacles[obstacles.length - 1].position.z - 100));
+        obstacles = obstacles.concat(createObstacles(obstacles[obstacles.length - 1].position.z - 100, trackSegments[trackSegments.length - 1].position.x));
+
       }
 
 
@@ -338,6 +354,7 @@ newObstacles.push(obstacle);
           firstObstacles[i].position.z = obstacles[obstacles.length - 1].position.z - 10;
           firstObstacles[i].position.x = (Math.random() - 0.5) * gapSize + trackDirection * trackWidth;
         }
+
         obstacles = obstacles.concat(firstObstacles);
       }
 
@@ -393,7 +410,7 @@ newObstacles.push(obstacle);
     spaceship.physicsImpostor.dispose();
     spaceship.physicsImpostor = new BABYLON.PhysicsImpostor(spaceship, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 0 }, scene);
 
-    
+
     for (const trackSegment of trackSegments) {
       trackSegment.physicsImpostor = new BABYLON.PhysicsImpostor(trackSegment, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
     }
