@@ -14,6 +14,7 @@ const playBackgroundMusic = (musicFilePath) => {
 };
 
 
+
 document.addEventListener('DOMContentLoaded', async function() {
   const backgroundMusic = playBackgroundMusic('bgmusic.mp3');
   const canvas = document.getElementById('renderCanvas');
@@ -176,6 +177,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       camera.position.z += (targetPosition.z - camera.position.z) * 0.1;
     };
 
+    const skybox = createSkybox(scene, "./skybox2.jpg");
 
     // Lights
     const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
@@ -216,22 +218,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     const gapSize = 3;
     const obstacleHeight = 1;
 
-    const createObstacles = (startZ) => {
-      const newObstacles = [];
-      for (let i = 0; i < 20; i++) {
-        const obstacleWidth = Math.random() * (trackWidth - gapSize) + gapSize;
-        const obstacle = BABYLON.MeshBuilder.CreateBox('obstacle' + i, { width: obstacleWidth, height: obstacleHeight, depth: 1 }, scene);
-        obstacle.position.y = 0.5;
-        obstacle.position.z = startZ - 10 * i - 20;
+const createObstacles = (startZ) => {
+const newObstacles = [];
+// Existing obstacle creation logic...
+for (let i = 0; i < 20; i++) {
+const obstacleWidth = Math.random() * (trackWidth - gapSize) + gapSize;
+const obstacle = BABYLON.MeshBuilder.CreateBox('obstacle' + i, { width: obstacleWidth, height: obstacleHeight, depth: 1 }, scene);
+obstacle.position.y = 0.5;
+obstacle.position.z = startZ - 10 * i - 20;
+const halfGap = Math.random() * (trackWidth - obstacleWidth) / 2; 
+const direction = Math.random() > 0.5 ? 1 : -1; 
+obstacle.position.x = direction * halfGap; 
 
-        const halfGap = Math.random() * (trackWidth - obstacleWidth) / 2;
-        const direction = Math.random() > 0.5 ? 1 : -1;
-        obstacle.position.x = direction * halfGap;
-
-        obstacle.material = new BABYLON.StandardMaterial('obstacleMat' + i, scene);
-        obstacle.material.diffuseColor = new BABYLON.Color3(1, 0, 0);
-        newObstacles.push(obstacle);
-      }
+obstacle.material = new BABYLON.StandardMaterial('obstacleMat' + i, scene); 
+obstacle.material.diffuseColor = new BABYLON.Color3(1, 0, 0); 
+newObstacles.push(obstacle); 
+}
       return newObstacles;
     };
 
@@ -278,6 +280,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
       // Keep the spaceship upright
       spaceship.rotationQuaternion = BABYLON.Quaternion.Identity();
+      // Update skybox position to match camera position
+      skybox.position.copyFrom(camera.position);
 
       updateCamera();
 
@@ -301,6 +305,11 @@ document.addEventListener('DOMContentLoaded', async function() {
       // Update score based on distance covered
       score = Math.floor(-spaceship.position.z);
       scoreDisplay.innerHTML = "Score: " + score;
+      if (spaceship.position.z <= obstacles[obstacles.length - 1].position.z - 100) {
+        // Generate new obstacles 100 units in front of the last obstacle
+        obstacles = obstacles.concat(createObstacles(obstacles[obstacles.length - 1].position.z - 100));
+      }
+
 
       // Update track segments and obstacles
       // Update track segments and obstacles
@@ -384,6 +393,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     spaceship.physicsImpostor.dispose();
     spaceship.physicsImpostor = new BABYLON.PhysicsImpostor(spaceship, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 0 }, scene);
 
+    
     for (const trackSegment of trackSegments) {
       trackSegment.physicsImpostor = new BABYLON.PhysicsImpostor(trackSegment, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
     }
