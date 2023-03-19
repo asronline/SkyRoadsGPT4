@@ -14,15 +14,20 @@
 
 <body>
   <div id="game-container">
+    <h1>SkyRoads GPT-4</h1>
     <div id="scoreDisplay">
       <h2>Score: 0</h2>
     </div>
     <div id="bestScoreDisplay">Best Score: 0</div>
-    <!--     <div id="gameOverDisplay">Press up</div> -->
-    <div id="canvas-container">
-      <canvas id="renderCanvas" width="430" height="320"></canvas>
+    <div id="canvas-and-game-over-wrapper">
+      <div id="canvas-container">
+        <canvas id="renderCanvas" width="430" height="320"></canvas>
+      </div>
+      <!-- gameOverDisplay will be added here via JavaScript -->
     </div>
+    <img src="controls.png"></img>
   </div>
+
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script id="ammo" async></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>

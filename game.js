@@ -129,11 +129,14 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
 
-  //Game over
+  // Game over
   const gameOverDisplay = document.createElement('div');
-  gameOverDisplay.style.cssText = 'position: absolute; top: 42%; left: 50%; transform: translate(-50%, -42%); font-size: 16px; color: white; background-image: url(gameover.jpg); width: 430px; height: 320px; display: none; border-radius: 20px; cursor: pointer; z-index: 9999; opacity: 0; transition: opacity 0.5s;';
-  // gameOverDisplay.innerHTML = 'Game Over! Click to restart!';
-  document.body.appendChild(gameOverDisplay);
+  gameOverDisplay.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, calc(-50% - 50px)); font-size: 16px; color: white; background-image: url(gameover.jpg); width: 430px; height: 320px; display: none; border-radius: 20px; cursor: pointer; z-index: 9999; opacity: 0; transition: opacity 0.5s;';
+  const renderCanvas = document.getElementById('renderCanvas');
+  renderCanvas.parentNode.insertBefore(gameOverDisplay, renderCanvas.nextSibling);
+
+
+
   let isGameOver = false;
   let scene = null;
 
