@@ -22,13 +22,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     canvas.focus();
   });
 
-  const backgroundMusic = playBackgroundMusic('bgmusic.mp3');
+  const backgroundMusic = playBackgroundMusic('Lungomare.mp3');
+  const engineSounds = playBackgroundMusic('spaceshipengine128.mp3');
   const engine = new BABYLON.Engine(canvas, true);
   const scoreDisplay = document.getElementById('scoreDisplay');
   let score = 0;
 
   let bestScore = 0;
-const bestScoreDisplay = document.getElementById('bestScoreDisplay');
+  const bestScoreDisplay = document.getElementById('bestScoreDisplay');
 
 
 
@@ -36,13 +37,13 @@ const bestScoreDisplay = document.getElementById('bestScoreDisplay');
   const speedChangeFactor = 0.01;
   let trackDirection = 0;
 
-  let musicStarted = false;
-  document.addEventListener('keydown', () => {
-    if (!musicStarted) {
-      playBackgroundMusic('bgmusic.mp3');
-      musicStarted = true;
-    }
-  });
+  // let musicStarted = false;
+  // document.addEventListener('keydown', () => {
+  //   if (!musicStarted) {
+  //     playBackgroundMusic('Lungomare.mp3');
+  //     musicStarted = true;
+  //   }
+  // });
 
   // //backgroundPlane variables
   // const imageWidth = 1536; // Replace with your image's width
@@ -117,6 +118,8 @@ const bestScoreDisplay = document.getElementById('bestScoreDisplay');
   const showGameOver = () => {
     isGameOver = true;
     gameOverDisplay.style.display = 'block';
+    backgroundMusic.pause()
+    engineSounds.pause()
     if (score > bestScore) {
       bestScore = score;
       bestScoreDisplay.innerHTML = "Best Score: " + bestScore;
@@ -143,6 +146,7 @@ const bestScoreDisplay = document.getElementById('bestScoreDisplay');
 
     backgroundMusic.currentTime = 0;
     backgroundMusic.play();
+    engineSounds.play();
   };
 
   // gameOverDisplay.addEventListener('click', () => {
@@ -198,8 +202,9 @@ const bestScoreDisplay = document.getElementById('bestScoreDisplay');
     const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
 
     // Spaceship
-    const spaceship = await loadGLTFModel(scene, './spaceshipa.glb'); // Change this path to the correct one
-    spaceship.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
+    const spaceship = await loadGLTFModel(scene, './tspaceship.glb'); // Change this path to the correct one
+    spaceship.scaling = new BABYLON.Vector3(1.5, 1.5, 1.5);
+    spaceship.rotation.y = Math.PI; // Add this line
 
 
     spaceship.position.y = 1;
