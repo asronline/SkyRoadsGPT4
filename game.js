@@ -13,6 +13,20 @@ const playBackgroundMusic = (musicFilePath) => {
   return music;
 };
 
+const playGameOverMusic = (musicFilePath) => {
+  const music = new Audio(musicFilePath);
+  music.loop = false;
+  music.autoplay = false; // Add this line
+  music.muted = true; // Add this line
+  music.play()
+    .then(() => {
+      music.muted = false; // Unmute the audio once it starts playing
+    })
+    .catch((error) => {
+      console.error('Error playing background music:', error);
+    });
+  return music;
+};
 
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -22,8 +36,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     canvas.focus();
   });
 
-  const backgroundMusic = playBackgroundMusic('Lungomare.mp3');
+  const backgroundMusic = playBackgroundMusic('bgmusic80s.mp3');
   const engineSounds = playBackgroundMusic('spaceshipengine128.mp3');
+  const explosionSounds = playGameOverMusic('explosion.mp3');
+  const gameoverMusic = playGameOverMusic('gameover.mp3');
+
   const engine = new BABYLON.Engine(canvas, true);
   const scoreDisplay = document.getElementById('scoreDisplay');
   let score = 0;
@@ -109,8 +126,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   //Game over
   const gameOverDisplay = document.createElement('div');
-  gameOverDisplay.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: white; display: none; cursor: pointer;';
-  gameOverDisplay.innerHTML = 'Game Over. Click to restart!';
+  gameOverDisplay.style.cssText = 'position: absolute; top: 42%; left: 50%; transform: translate(-50%, -42%); font-size: 16px; color: white; background-image: url(bedroom80s.jpg); width: 430px; height: 320px; display: none; border-radius: 20px; cursor: pointer; z-index: 9999; opacity: 0; transition: opacity 0.5s;';
+  gameOverDisplay.innerHTML = 'Game Over! Click to restart!';
   document.body.appendChild(gameOverDisplay);
   let isGameOver = false;
   let scene = null;
@@ -118,6 +135,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   const showGameOver = () => {
     isGameOver = true;
     gameOverDisplay.style.display = 'block';
+    setTimeout(() => {
+      gameOverDisplay.style.opacity = '1';
+    }, 10);
+    explosionSounds.play()
+    gameoverMusic.play()
     backgroundMusic.pause()
     engineSounds.pause()
     if (score > bestScore) {
@@ -128,7 +150,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   const restartGame = async () => {
     isGameOver = false;
-    gameOverDisplay.style.display = 'none';
+    gameOverDisplay.style.opacity = '0';
+    setTimeout(() => {
+      gameOverDisplay.style.display = 'none';
+    }, 500);
     engine.stopRenderLoop();
     spaceshipSpeed = 0.1;
 
@@ -169,14 +194,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color3(0.1, 0.1, 0.1);
 
-    createSkybox(scene, "./skybox2.jpg"); // Update the path to your skybox image if necessary
+    createSkybox(scene, "./skyboxmj7.jpg"); // Update the path to your skybox image if necessary
 
 
     // createBackgroundPlane(scene, "spacefloor.jpg");
     // const backgroundPlane = createBackgroundPlane(scene, "canvasbg.png");
 
     // const floorPlane = createFloorPlane(scene, "spacefloor.jpg");
-
 
     // Camera
     const camera = new BABYLON.FreeCamera('freeCamera', new BABYLON.Vector3(0, 4, -10), scene);
@@ -202,8 +226,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
 
     // Spaceship
-    const spaceship = await loadGLTFModel(scene, './tspaceship.glb'); // Change this path to the correct one
-    spaceship.scaling = new BABYLON.Vector3(1.5, 1.5, 1.5);
+    const spaceship = await loadGLTFModel(scene, './spaceshipa.glb'); // Change this path to the correct one
+    spaceship.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
     spaceship.rotation.y = Math.PI; // Add this line
 
 
@@ -278,10 +302,10 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
       // Spaceship controls
       if (inputMap["ArrowLeft"]) {
-        spaceship.position.x += 0.1;
+        spaceship.position.x += 0.2;
       }
       if (inputMap["ArrowRight"]) {
-        spaceship.position.x -= 0.1;
+        spaceship.position.x -= 0.2;
       }
 
 

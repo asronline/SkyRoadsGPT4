@@ -4,6 +4,7 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
+  background-image: url('./bedroom80s.jpg');
   background-color: #222;
   font-family: 'VT323', monospace;
   color: #fff;
@@ -44,3 +45,70 @@ canvas {
 #renderCanvas:focus {
   outline: none;
 }
+
+/* #gameOverDisplay {
+  position: fixed; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  font-size: 16px; color: white; 
+  display: none; 
+  cursor: pointer;
+} */
+
+/* In your CSS file */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes glitchEffect {
+  0% {
+    clip-path: inset(50% 0 50% 0);
+  }
+  5% {
+    clip-path: inset(30% 0 40% 0);
+  }
+  10% {
+    clip-path: inset(20% 0 30% 0);
+  }
+  15% {
+    clip-path: inset(50% 0 50% 0);
+  }
+  20% {
+    clip-path: inset(10% 0 40% 0);
+  }
+  25% {
+    clip-path: inset(40% 0 30% 0);
+  }
+  30% {
+    clip-path: inset(20% 0 50% 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* 
+.game-over-display {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  transform: translate(-50%, -42%);
+  font-size: 16px;
+  color: white;
+  background-image: url(bedroom80s.jpg);
+  width: 430px;
+  height: 320px;
+  display: none;
+  border-radius: 20px;
+  cursor: pointer;
+  animation: fadeIn 1s ease-in-out forwards, glitchEffect 2s steps(10) 1s forwards;
+}
+
+.game-over-display.show {
+  display: block;
+} */
