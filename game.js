@@ -1,31 +1,19 @@
-const playBackgroundMusic = (musicFilePath) => {
-  const music = new Audio(musicFilePath);
-  music.loop = true;
-  music.autoplay = true; // Add this line
-  music.muted = true; // Add this line
-  music.play()
-    .then(() => {
-      music.muted = false; // Unmute the audio once it starts playing
-    })
-    .catch((error) => {
-      console.error('Error playing background music:', error);
-    });
-  return music;
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+const loadAudioBuffer = async (url) => {
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  return audioBuffer;
 };
 
-const playGameOverMusic = (musicFilePath) => {
-  const music = new Audio(musicFilePath);
-  music.loop = false;
-  music.autoplay = false; // Add this line
-  music.muted = true; // Add this line
-  music.play()
-    .then(() => {
-      music.muted = false; // Unmute the audio once it starts playing
-    })
-    .catch((error) => {
-      console.error('Error playing background music:', error);
-    });
-  return music;
+const playAudioBuffer = (audioBuffer, loop = false) => {
+  const source = audioContext.createBufferSource();
+  source.buffer = audioBuffer;
+  source.loop = loop;
+  source.connect(audioContext.destination);
+  source.start();
+  return source;
 };
 
 
@@ -36,10 +24,27 @@ document.addEventListener('DOMContentLoaded', async function() {
     canvas.focus();
   });
 
-  const backgroundMusic = playBackgroundMusic('bgmusic80s.mp3');
-  const engineSounds = playBackgroundMusic('spaceshipengine128.mp3');
-  const explosionSounds = playGameOverMusic('explosion.mp3');
-  const gameoverMusic = playGameOverMusic('gameover.mp3');
+  let hasStarted = false;
+
+  const startAudio = () => {
+    if (!hasStarted) {
+      backgroundMusic = playAudioBuffer(backgroundMusicBuffer, true);
+      engineSounds = playAudioBuffer(engineSoundsBuffer, true);
+      hasStarted = true;
+    }
+  };
+
+  const backgroundMusicBuffer = await loadAudioBuffer('bgmusic80s.mp3');
+  const engineSoundsBuffer = await loadAudioBuffer('spaceshipengine128.mp3');
+  const explosionSoundsBuffer = await loadAudioBuffer('explosion.mp3');
+  const gameoverMusicBuffer = await loadAudioBuffer('gameover.mp3');
+
+  // let backgroundMusic = playAudioBuffer(backgroundMusicBuffer, true);
+  // let engineSounds = playAudioBuffer(engineSoundsBuffer, true);
+  // const backgroundMusic = playBackgroundMusic('bgmusic80s.mp3');
+  // const engineSounds = playBackgroundMusic('spaceshipengine128.mp3');
+  // const explosionSounds = playGameOverMusic('explosion.mp3');
+  // const gameoverMusic = playGameOverMusic('gameover.mp3');
 
   const engine = new BABYLON.Engine(canvas, true);
   const scoreDisplay = document.getElementById('scoreDisplay');
@@ -138,10 +143,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     setTimeout(() => {
       gameOverDisplay.style.opacity = '1';
     }, 10);
-    explosionSounds.play()
-    gameoverMusic.play()
-    backgroundMusic.pause()
-    engineSounds.pause()
+    backgroundMusic.stop();
+    engineSounds.stop();
+    explosionSounds = playAudioBuffer(explosionSoundsBuffer);
+    gameoverMusic = playAudioBuffer(gameoverMusicBuffer);
     if (score > bestScore) {
       bestScore = score;
       bestScoreDisplay.innerHTML = "Best Score: " + bestScore;
@@ -169,9 +174,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       scene.render();
     });
 
-    backgroundMusic.currentTime = 0;
-    backgroundMusic.play();
-    engineSounds.play();
+    // backgroundMusic = playAudioBuffer(backgroundMusicBuffer, true);
+    // engineSounds = playAudioBuffer(engineSoundsBuffer, true);
   };
 
   // gameOverDisplay.addEventListener('click', () => {
@@ -409,7 +413,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     const onKeyDown = (evt) => {
       inputMap[evt.sourceEvent.key] = evt.sourceEvent.type === "keydown";
-
+      if (!hasStarted) {
+        startAudio();
+      }
       if (isGameOver && evt.sourceEvent.key === "ArrowUp") {
         restartGame();
       }
