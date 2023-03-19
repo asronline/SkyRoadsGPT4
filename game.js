@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   };
 
   const backgroundMusicBuffer = await loadAudioBuffer('bgmusic80s.mp3');
-  const engineSoundsBuffer = await loadAudioBuffer('spaceshipengine128.mp3');
+  const engineSoundsBuffer = await loadAudioBuffer('engine.mp3');
   const explosionSoundsBuffer = await loadAudioBuffer('explosion.mp3');
   const gameoverMusicBuffer = await loadAudioBuffer('gameover.mp3');
 
@@ -397,11 +397,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
       // Check for collisions
       for (const obstacle of obstacles) {
-        //COMMENT IT OUT IF YOU WANT TO DRIVE ENDLESSLY
-        // if (spaceship.intersectsMesh(obstacle, false) && spaceship.position.y <= obstacleHeight) {
-        //   // Restart the game or end the game
-        //   showGameOver();
-        // }
+        // COMMENT IT OUT IF YOU WANT TO DRIVE ENDLESSLY
+        if (spaceship.intersectsMesh(obstacle, false) && spaceship.position.y <= obstacleHeight) {
+          // Restart the game or end the game
+          showGameOver();
+        }
       }
     });
 
