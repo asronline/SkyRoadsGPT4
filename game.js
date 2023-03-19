@@ -126,8 +126,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   //Game over
   const gameOverDisplay = document.createElement('div');
-  gameOverDisplay.style.cssText = 'position: absolute; top: 42%; left: 50%; transform: translate(-50%, -42%); font-size: 16px; color: white; background-image: url(bedroom80s.jpg); width: 430px; height: 320px; display: none; border-radius: 20px; cursor: pointer; z-index: 9999; opacity: 0; transition: opacity 0.5s;';
-  gameOverDisplay.innerHTML = 'Game Over! Click to restart!';
+  gameOverDisplay.style.cssText = 'position: absolute; top: 42%; left: 50%; transform: translate(-50%, -42%); font-size: 16px; color: white; background-image: url(gameover.jpg); width: 430px; height: 320px; display: none; border-radius: 20px; cursor: pointer; z-index: 9999; opacity: 0; transition: opacity 0.5s;';
+  // gameOverDisplay.innerHTML = 'Game Over! Click to restart!';
   document.body.appendChild(gameOverDisplay);
   let isGameOver = false;
   let scene = null;
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       trackSegment.position.x = direction * trackWidth;
       trackSegment.rotation.y = direction * Math.PI / 6;
       trackSegment.material = new BABYLON.StandardMaterial('trackMat', scene);
-      const trackTexture = new BABYLON.Texture('./texture2.jpg', scene); // Replace with your image's path and extension
+      const trackTexture = new BABYLON.Texture('./mjtexture.jpg', scene); // Replace with your image's path and extension
       trackTexture.uScale = 15; // Repeat the texture 5 times along the width
       trackTexture.vScale = 1; // Repeat the texture 20 times along the depth
 
