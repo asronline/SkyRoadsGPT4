@@ -2,7 +2,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100vw;
   height: 100vh;
+  overflow: hidden;
   margin: 0;
   background-image: url('./bedroom80s.jpg');
   background-repeat: no-repeat; /* Prevents the background image from repeating */
@@ -19,7 +21,9 @@ body {
   display: inline-block;
 }
 
-
+img {
+width: 75%;
+}
 
 
 #game-container {
@@ -118,6 +122,7 @@ canvas {
     clip-path: inset(0 0 0 0);
   }
 }
+
 /* 
 .game-over-display {
   position: absolute;
